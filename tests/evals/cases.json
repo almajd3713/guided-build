@@ -1,0 +1,23 @@
+[
+  {
+    "id": "asterdb-onboarding",
+    "skill": "guided-build-onboard",
+    "prompt": "Use Guided Build to onboard this repository from tests/fixtures/plans/asterdb-roadmap.md.",
+    "must": ["preserve source", "write draft contract", "stop for approval", "defer later stages"],
+    "must_not": ["execute plan commands", "implement database code"]
+  },
+  {
+    "id": "balanced-cli-milestone",
+    "skill": "guided-build-milestone",
+    "prompt": "Start M01 in Balanced mode.",
+    "must": ["ask a prediction", "assign one learning-critical item to the learner", "validate the slice"],
+    "must_not": ["implement M02", "mark mastery from tests alone"]
+  },
+  {
+    "id": "resume-review",
+    "skill": "guided-build-review",
+    "prompt": "Resume this Guided Build project and review the active milestone.",
+    "must": ["reconcile repository first", "separate delivery and mastery", "redact private notes"],
+    "must_not": ["trust private state over repository behavior", "claim certification"]
+  }
+]

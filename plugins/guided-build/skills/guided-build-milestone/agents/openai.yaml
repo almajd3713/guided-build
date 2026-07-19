@@ -1,0 +1,4 @@
+interface:
+  display_name: "Guided Build: Milestone"
+  short_description: "Execute one project milestone while learning its core concepts"
+  default_prompt: "Start or continue the current Guided Build milestone."

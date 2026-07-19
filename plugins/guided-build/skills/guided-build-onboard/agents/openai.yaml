@@ -1,0 +1,4 @@
+interface:
+  display_name: "Guided Build: Onboard"
+  short_description: "Turn a software plan into an approved learning contract"
+  default_prompt: "Onboard this project into Guided Build from its existing plan."

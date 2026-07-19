@@ -1,0 +1,4 @@
+interface:
+  display_name: "Guided Build: Review"
+  short_description: "Review implementation evidence and resume learning safely"
+  default_prompt: "Review or resume my Guided Build project from its saved evidence."
