@@ -17,6 +17,8 @@ Build a source map before authoring milestones:
 
 Preserve mandatory/optional distinctions. Turn broad phases into multiple milestones only when they have separate validation gates or prerequisite concepts. Merge tiny tasks when separation adds no learning or delivery value.
 
+Split composite concept phrases into atomic bullets inside the same milestone. This refines calibration and prerequisite review without inventing new scope or milestones.
+
 ## Ambiguity policy
 
 Ask the user when alternatives materially change:

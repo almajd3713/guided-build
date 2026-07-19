@@ -51,6 +51,30 @@ class ContractTests(unittest.TestCase):
         report = guided_build.validate_evidence(VALID_EVIDENCE, VALID_CONTRACT)
         self.assertTrue(report["valid"], report["errors"])
 
+    def test_likely_composite_concept_warns_without_invalidating_contract(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "project.md"
+            text = VALID_CONTRACT.read_text(encoding="utf-8").replace(
+                "- Boundary validation",
+                "- Parsing, validation, and error reporting",
+            )
+            path.write_text(text, encoding="utf-8")
+            report = guided_build.validate_contract(path)
+            self.assertTrue(report["valid"], report["errors"])
+            self.assertTrue(any("may be composite" in item for item in report["warnings"]))
+
+    def test_evidence_rejects_private_learner_labels(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "evidence.md"
+            text = VALID_EVIDENCE.read_text(encoding="utf-8").replace(
+                "The learner predicted and diagnosed an empty-title failure.",
+                "Learner self-report: new to parser boundaries.",
+            )
+            path.write_text(text, encoding="utf-8")
+            report = guided_build.validate_evidence(path, VALID_CONTRACT)
+            self.assertFalse(report["valid"])
+            self.assertTrue(any("private learner label" in item for item in report["errors"]))
+
     def test_duplicate_frontmatter_key_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "project.md"
@@ -216,6 +240,113 @@ class StateTests(unittest.TestCase):
             )
         self.assertIn('"familiarity": "new"', private_output.getvalue())
 
+    def test_preferences_and_topic_familiarity_are_private_and_normalized(self) -> None:
+        self.quietly(
+            guided_build.set_preferences_command,
+            self.project_args(
+                guidance="execution_first",
+                verbosity="compact",
+                struggle="offer_choices",
+            ),
+        )
+        self.quietly(
+            guided_build.record_familiarity_command,
+            self.project_args(
+                milestone="M01",
+                topic="  unsigned   integer codecs ",
+                level="new",
+            ),
+        )
+        self.quietly(
+            guided_build.record_familiarity_command,
+            self.project_args(
+                milestone="M01",
+                topic="Unsigned Integer Codecs",
+                level="comfortable",
+            ),
+        )
+        _, state, _ = guided_build.load_state(self.contract, self.repo)
+        self.assertEqual(state["preferences"]["verbosity"], "compact")
+        topics = state["calibration_topics"]["M01"]
+        self.assertEqual(len(topics), 1)
+        self.assertEqual(topics["unsigned integer codecs"]["familiarity"], "comfortable")
+
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            guided_build.status_command(self.project_args(include_private_notes=False))
+        self.assertNotIn("preferences", output.getvalue())
+        self.assertNotIn("calibration_topics", output.getvalue())
+
+        exported = self.root / "calibration-export.json"
+        self.quietly(
+            guided_build.export_state_command,
+            self.project_args(output=exported, include_private_notes=False),
+        )
+        public_data = json.loads(exported.read_text(encoding="utf-8"))
+        self.assertNotIn("preferences", public_data)
+        self.assertNotIn("calibration_topics", public_data)
+
+        private_export = self.root / "private-calibration-export.json"
+        self.quietly(
+            guided_build.export_state_command,
+            self.project_args(output=private_export, include_private_notes=True),
+        )
+        private_data = json.loads(private_export.read_text(encoding="utf-8"))
+        self.assertEqual(private_data["preferences"]["guidance"], "execution_first")
+        self.assertIn("unsigned integer codecs", private_data["calibration_topics"]["M01"])
+
+    def test_preferences_require_at_least_one_value(self) -> None:
+        with self.assertRaisesRegex(guided_build.GuidedBuildError, "at least one"):
+            guided_build.set_preferences_command(
+                self.project_args(guidance=None, verbosity=None, struggle=None)
+            )
+
+    def test_topic_familiarity_validates_length_and_milestone(self) -> None:
+        with self.assertRaisesRegex(guided_build.GuidedBuildError, "must not be empty"):
+            guided_build.record_familiarity_command(
+                self.project_args(milestone="M01", topic="   ", level="new")
+            )
+        with self.assertRaisesRegex(guided_build.GuidedBuildError, "unknown milestone"):
+            guided_build.record_familiarity_command(
+                self.project_args(milestone="M99", topic="transactions", level="new")
+            )
+
+    def test_prerequisite_gate_uses_current_contract_concepts(self) -> None:
+        self.quietly(guided_build.init_state_command, self.project_args())
+        self.contract.write_text(
+            self.contract.read_text(encoding="utf-8").replace(
+                "- Boundary validation", "- Input validation"
+            ),
+            encoding="utf-8",
+        )
+        _, state, contract = guided_build.load_state(self.contract, self.repo)
+        self.assertEqual(state["milestones"]["M01"]["concepts"], ["Input validation"])
+        state["milestones"]["M01"]["delivery_status"] = "complete"
+        state["concepts"]["Boundary validation"] = {"mastery_status": "demonstrated"}
+        state["concepts"]["Input validation"] = {"mastery_status": "practiced"}
+        location, _ = guided_build.state_location(self.contract, self.repo)
+        guided_build.atomic_json(location, state)
+        with self.assertRaisesRegex(guided_build.GuidedBuildError, "Input validation"):
+            guided_build.start_milestone_command(
+                self.project_args(milestone="M02", depth="fast", slice=None)
+            )
+
+    def test_topic_familiarity_does_not_satisfy_mastery_gate(self) -> None:
+        self.quietly(guided_build.init_state_command, self.project_args())
+        self.quietly(
+            guided_build.record_familiarity_command,
+            self.project_args(
+                milestone="M01", topic="Boundary validation", level="comfortable"
+            ),
+        )
+        location, state, _ = guided_build.load_state(self.contract, self.repo)
+        state["milestones"]["M01"]["delivery_status"] = "complete"
+        guided_build.atomic_json(location, state)
+        with self.assertRaisesRegex(guided_build.GuidedBuildError, "requires review"):
+            guided_build.start_milestone_command(
+                self.project_args(milestone="M02", depth="fast", slice=None)
+            )
+
     def test_draft_contract_cannot_start_work(self) -> None:
         self.contract.write_text(
             self.contract.read_text(encoding="utf-8").replace(
@@ -300,6 +431,16 @@ class StateTests(unittest.TestCase):
             ]
         )
         self.assertEqual(args.familiarity, "some_exposure")
+
+    def test_cli_accepts_preference_and_topic_commands(self) -> None:
+        preferences = guided_build.build_parser().parse_args(
+            ["set-preferences", "--guidance", "execution_first", "--verbosity", "compact"]
+        )
+        self.assertEqual(preferences.guidance, "execution_first")
+        familiarity = guided_build.build_parser().parse_args(
+            ["record-familiarity", "M01", "u64 codecs", "new"]
+        )
+        self.assertEqual(familiarity.topic, "u64 codecs")
 
 
 class PackagingTests(unittest.TestCase):

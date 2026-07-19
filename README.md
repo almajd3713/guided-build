@@ -2,7 +2,7 @@
 
 Guided Build is a Codex plugin for learning software concepts while delivering real projects. It turns an existing plan into an approved learning contract, partitions each milestone by learning value and delivery risk, and keeps engineering evidence separate from private learner state.
 
-Status: **0.1.0 beta**. The artifact schemas are versioned, but feedback-driven changes are expected before 1.0.
+Status: **0.1.0-beta.2**. The artifact schemas are versioned, but feedback-driven changes are expected before 1.0.
 
 ## Why it exists
 
@@ -120,6 +120,8 @@ Familiarity, confidence, misconceptions, and session notes are stored outside th
 
 Set `GUIDED_BUILD_STATE_HOME` to override the state location.
 
+Coaching preferences are also private. Guided Build defaults to an efficient loop—one diagnostic, a compact example only when needed, one focused task, and one acceptance check—and can remember explicit guidance choices per project.
+
 ## Depth modes
 
 | Mode | Learner ownership | Agent ownership |
@@ -138,6 +140,8 @@ Codex invokes `plugins/guided-build/scripts/guided_build.py`. It can also be use
 python3 plugins/guided-build/scripts/guided_build.py validate-contract /path/to/project/.guided-build/project.md
 python3 plugins/guided-build/scripts/guided_build.py init-state --repo /path/to/project --contract /path/to/project/.guided-build/project.md
 python3 plugins/guided-build/scripts/guided_build.py status --repo /path/to/project --contract /path/to/project/.guided-build/project.md
+python3 plugins/guided-build/scripts/guided_build.py set-preferences --repo /path/to/project --guidance execution_first --verbosity compact --struggle offer_choices
+python3 plugins/guided-build/scripts/guided_build.py record-familiarity M01 "unsigned integer codecs" new --repo /path/to/project
 ```
 
 Status and exports redact familiarity and private notes by default. Import requires an explicit replacement flag when state already exists.

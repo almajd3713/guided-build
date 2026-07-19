@@ -21,6 +21,62 @@
     "must_not": ["start with an open-ended API design question", "treat unfamiliarity as failed mastery", "silently switch depth"]
   },
   {
+    "id": "execution-first-new-concept",
+    "skill": "guided-build-milestone",
+    "prompt": "This is new to me. I prefer learning by trying a small example first.",
+    "must": ["use one safe concrete experiment", "explain the observed invariant", "ask one focused follow-up task"],
+    "must_not": ["give a textbook survey", "ask an open-ended design question first", "publish the preference"]
+  },
+  {
+    "id": "comfortable-but-wrong",
+    "skill": "guided-build-milestone",
+    "prompt": "I'm comfortable with this. decodeU64 should return number because TypeScript says it is an integer.",
+    "must": ["use the diagnostic result over the familiarity label", "show one compact counterexample", "check the corrected invariant"],
+    "must_not": ["mark mastery from self-report", "shame the learner", "repeat the whole lesson"]
+  },
+  {
+    "id": "ambiguous-terse-answer",
+    "skill": "guided-build-milestone",
+    "prompt": "yes",
+    "must": ["ask one focused clarification"],
+    "must_not": ["infer acceptance", "infer understanding", "repeat every prior question"]
+  },
+  {
+    "id": "two-unsuccessful-attempts",
+    "skill": "guided-build-milestone",
+    "prompt": "I tried the revised explanation too and still do not see it.",
+    "must": ["offer a new example", "offer pairing", "offer a smaller task", "offer ownership transfer"],
+    "must_not": ["force ownership transfer", "repeat the same explanation"]
+  },
+  {
+    "id": "batch-mechanical-feedback",
+    "skill": "guided-build-milestone",
+    "prompt": "My test has the wrong import, assertion type, and fixture wiring. Help me continue the codec task.",
+    "must": ["scaffold incidental mechanics", "batch the fixes", "return to the codec invariant"],
+    "must_not": ["create three learner gates", "treat imports as target mastery"]
+  },
+  {
+    "id": "correct-diagnostic-skips-lesson",
+    "skill": "guided-build-milestone",
+    "prompt": "The eight-byte decoder must reject seven bytes because the representation is incomplete, and bigint is required to preserve all u64 values.",
+    "must": ["recognize the correct diagnostic", "skip remedial teaching", "assign one focused learner task"],
+    "must_not": ["repeat the u64 primer", "ask another familiarity questionnaire"]
+  },
+  {
+    "id": "no-public-familiarity-fallback",
+    "skill": "guided-build-milestone",
+    "prompt": "Record that u64 codecs are new to me, then update milestone evidence.",
+    "must": ["use private topic familiarity", "keep public evidence outcome-based"],
+    "must_not": ["write the self-report to evidence", "invent a broad contract concept"]
+  },
+  {
+    "id": "compact-interaction-budget",
+    "skill": "guided-build-milestone",
+    "prompt": "Continue in compact mode; I answer briefly and do not want progress narration.",
+    "must": ["keep routine updates concise", "ask one primary question per gate", "avoid narrating routine tool calls"],
+    "must_not": ["bundle multiple conceptual questions", "provide a transcript-style recap"]
+  },
+  {
     "id": "resume-review",
     "skill": "guided-build-review",
     "prompt": "Resume this Guided Build project and review the active milestone.",

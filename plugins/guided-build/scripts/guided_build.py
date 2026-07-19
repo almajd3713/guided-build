@@ -23,10 +23,21 @@ DEPTHS = {"fast", "balanced", "deep"}
 DELIVERY_STATUSES = {"not_started", "in_progress", "blocked", "complete"}
 MASTERY_STATUSES = {"unassessed", "introduced", "practiced", "demonstrated", "revisit_due"}
 FAMILIARITY_LEVELS = {"new", "some_exposure", "comfortable"}
+GUIDANCE_STYLES = {"adaptive", "theory_first", "example_first", "execution_first"}
+VERBOSITY_STYLES = {"compact", "adaptive", "detailed"}
+STRUGGLE_POLICIES = {"offer_choices", "auto_scaffold", "keep_coaching"}
 PRIVATE_CONCEPT_FIELDS = {"confidence", "familiarity", "misconceptions"}
 PROJECT_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{1,63}$")
 MILESTONE_RE = re.compile(r"^###\s+([A-Z][A-Z0-9_-]*\d+)\s+[—-]\s+(.+?)\s*$")
 SUBHEADING_RE = re.compile(r"^####\s+(.+?)\s*$")
+COMPOSITE_CONCEPT_RE = re.compile(r";|,.*\b(?:and|or)\b", re.IGNORECASE)
+PRIVATE_EVIDENCE_PATTERNS = {
+    "learner self-report": re.compile(r"\b(?:learner\s+)?self[- ]report(?:ed|s|ing)?\b", re.IGNORECASE),
+    "confidence rating": re.compile(r"\bconfidence\s+(?:rating|score|level)\b", re.IGNORECASE),
+    "misconception note": re.compile(r"\bmisconception(?:s|\s+note)?\b", re.IGNORECASE),
+    "guidance preference": re.compile(r"\b(?:guidance|learning)\s+preference(?:s)?\b", re.IGNORECASE),
+    "private-state label": re.compile(r"\bprivate[- ]state\b", re.IGNORECASE),
+}
 
 REQUIRED_CONTRACT_SECTIONS = {"outcomes", "non-goals", "validation", "milestones"}
 REQUIRED_MILESTONE_SECTIONS = {
@@ -246,6 +257,11 @@ def validate_contract(path: Path) -> dict[str, Any]:
         except GuidedBuildError as exc:
             errors.append(str(exc))
     for milestone_id, milestone in milestones.items():
+        for concept in milestone["concepts"]:
+            if COMPOSITE_CONCEPT_RE.search(concept):
+                warnings.append(
+                    f"{milestone_id} concept {concept!r} may be composite; prefer one atomic concept per bullet"
+                )
         for dependent in milestone["dependents"]:
             if dependent in milestones and milestone_id not in milestones[dependent]["prerequisites"]:
                 warnings.append(
@@ -290,6 +306,10 @@ def validate_evidence(path: Path, contract_path: Path | None) -> dict[str, Any]:
         content = section_body(lines, section_name)
         if content is not None and not any(line.strip() for line in content):
             errors.append(f"evidence section {section_name!r} is empty")
+    body = "\n".join(lines)
+    for label, pattern in PRIVATE_EVIDENCE_PATTERNS.items():
+        if pattern.search(body):
+            errors.append(f"evidence contains a forbidden private learner label: {label}")
     if contract_path:
         contract = validate_contract(contract_path)
         if not contract["valid"]:
@@ -354,6 +374,8 @@ def new_state(contract_path: Path, repo: Path, contract: dict[str, Any]) -> dict
             for milestone_id in contract["milestones"]
         },
         "concepts": {},
+        "preferences": {},
+        "calibration_topics": {},
         "session_notes": [],
         "created_at": now,
         "updated_at": now,
@@ -392,8 +414,10 @@ def load_state(
     except (OSError, json.JSONDecodeError) as exc:
         raise GuidedBuildError(f"cannot read private state {location}: {exc}") from exc
     validate_state_structure(state, contract)
+    state.setdefault("preferences", {})
+    state.setdefault("calibration_topics", {})
     for milestone_id in contract["milestones"]:
-        state.setdefault("milestones", {}).setdefault(
+        milestone = state.setdefault("milestones", {}).setdefault(
             milestone_id,
             {
                 "delivery_status": "not_started",
@@ -402,6 +426,7 @@ def load_state(
                 "concepts": [],
             },
         )
+        milestone["concepts"] = list(contract["milestones"][milestone_id]["concepts"])
     return location, state, contract
 
 
@@ -418,6 +443,10 @@ def validate_state_structure(state: Any, contract: dict[str, Any]) -> None:
         raise GuidedBuildError("private state concepts must be an object")
     if not isinstance(state.get("session_notes"), list):
         raise GuidedBuildError("private state session_notes must be an array")
+    if "preferences" in state and not isinstance(state["preferences"], dict):
+        raise GuidedBuildError("private state preferences must be an object")
+    if "calibration_topics" in state and not isinstance(state["calibration_topics"], dict):
+        raise GuidedBuildError("private state calibration_topics must be an object")
 
 
 def validate_contract_command(args: argparse.Namespace) -> int:
@@ -434,13 +463,24 @@ def validate_evidence_command(args: argparse.Namespace) -> int:
 
 def init_state_command(args: argparse.Namespace) -> int:
     location, state, _ = load_state(args.contract, args.repo, create=True)
-    print(json.dumps({"state_path": str(location), "state": state}, indent=2))
+    print(
+        json.dumps(
+            {
+                "state_path": str(location),
+                "project_id": state["project_id"],
+                "initialized": True,
+            },
+            indent=2,
+        )
+    )
     return 0
 
 
 def redact_private_notes(state: dict[str, Any]) -> dict[str, Any]:
     visible = json.loads(json.dumps(state))
     visible["session_notes"] = []
+    visible.pop("preferences", None)
+    visible.pop("calibration_topics", None)
     for concept in visible.get("concepts", {}).values():
         for field in PRIVATE_CONCEPT_FIELDS:
             concept.pop(field, None)
@@ -465,7 +505,7 @@ def start_milestone_command(args: argparse.Namespace) -> int:
         prior = state["milestones"].get(prerequisite, {})
         if prior.get("delivery_status") != "complete":
             unresolved.append(f"{prerequisite} delivery is incomplete")
-        for concept_name in prior.get("concepts", []):
+        for concept_name in contract["milestones"][prerequisite]["concepts"]:
             mastery = state["concepts"].get(concept_name, {}).get(
                 "mastery_status", "unassessed"
             )
@@ -481,6 +521,52 @@ def start_milestone_command(args: argparse.Namespace) -> int:
     state["updated_at"] = utc_now()
     atomic_json(location, state)
     print(json.dumps({"active_milestone": args.milestone, "depth": args.depth}, indent=2))
+    return 0
+
+
+def set_preferences_command(args: argparse.Namespace) -> int:
+    updates = {
+        key: value
+        for key, value in {
+            "guidance": args.guidance,
+            "verbosity": args.verbosity,
+            "struggle": args.struggle,
+        }.items()
+        if value is not None
+    }
+    if not updates:
+        raise GuidedBuildError("set-preferences requires at least one preference flag")
+    location, state, _ = load_state(args.contract, args.repo, create=True)
+    state.setdefault("preferences", {}).update(updates)
+    state["updated_at"] = utc_now()
+    atomic_json(location, state)
+    print(json.dumps({"preferences_updated": sorted(updates)}, indent=2))
+    return 0
+
+
+def normalize_topic(value: str) -> str:
+    topic = re.sub(r"\s+", " ", value.strip())
+    if not topic:
+        raise GuidedBuildError("familiarity topic must not be empty")
+    if len(topic) > 120:
+        raise GuidedBuildError("familiarity topic must be at most 120 characters")
+    return topic
+
+
+def record_familiarity_command(args: argparse.Namespace) -> int:
+    location, state, contract = load_state(args.contract, args.repo, create=True)
+    if args.milestone not in contract["milestones"]:
+        raise GuidedBuildError(f"unknown milestone {args.milestone}")
+    topic = normalize_topic(args.topic)
+    topics = state.setdefault("calibration_topics", {}).setdefault(args.milestone, {})
+    topics[topic.casefold()] = {
+        "topic": topic,
+        "familiarity": args.level,
+        "updated_at": utc_now(),
+    }
+    state["updated_at"] = utc_now()
+    atomic_json(location, state)
+    print(json.dumps({"milestone": args.milestone, "topic_recorded": True}, indent=2))
     return 0
 
 
@@ -619,6 +705,20 @@ def build_parser() -> argparse.ArgumentParser:
     add_project_arguments(status)
     status.add_argument("--include-private-notes", action="store_true")
     status.set_defaults(handler=status_command)
+
+    preferences = commands.add_parser("set-preferences")
+    add_project_arguments(preferences)
+    preferences.add_argument("--guidance", choices=sorted(GUIDANCE_STYLES))
+    preferences.add_argument("--verbosity", choices=sorted(VERBOSITY_STYLES))
+    preferences.add_argument("--struggle", choices=sorted(STRUGGLE_POLICIES))
+    preferences.set_defaults(handler=set_preferences_command)
+
+    familiarity = commands.add_parser("record-familiarity")
+    add_project_arguments(familiarity)
+    familiarity.add_argument("milestone")
+    familiarity.add_argument("topic")
+    familiarity.add_argument("level", choices=sorted(FAMILIARITY_LEVELS))
+    familiarity.set_defaults(handler=record_familiarity_command)
 
     start = commands.add_parser("start-milestone")
     add_project_arguments(start)

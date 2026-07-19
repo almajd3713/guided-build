@@ -12,7 +12,18 @@ Classify each learning-critical concept as:
 
 Flag concepts that are niche, project-specific, unusually low-level, mathematical, security-sensitive, concurrency-sensitive, or likely absent from general application-development experience. Calibrate flagged concepts explicitly.
 
-## 2. Calibrate without turning it into an exam
+## 2. Use the efficient-learning loop
+
+For each slice, prefer this sequence:
+
+1. one concrete diagnostic;
+2. one compact worked example only when the diagnostic reveals a gap;
+3. one focused learner task;
+4. one acceptance check tied to the invariant.
+
+Skip the lesson when the diagnostic is correct. Reuse recent accepted evidence instead of retesting established knowledge. Normally keep a slice to four learner gates or fewer.
+
+## 3. Calibrate without turning it into an exam
 
 Ask a compact question such as:
 
@@ -20,9 +31,9 @@ Ask a compact question such as:
 
 Follow with one concrete diagnostic that reveals the learner's current mental model. Prefer explaining a tiny example over asking an open-ended architecture question. Do not use confidence alone as mastery evidence, and do not interpret an incorrect answer as failure.
 
-When several concepts are involved, calibrate the smallest prerequisite cluster rather than asking a long questionnaire. Reuse recent evidence instead of retesting established knowledge.
+When several concepts are involved, calibrate the smallest prerequisite cluster rather than asking a long questionnaire. A terse answer that could mean several things needs one focused clarification, not an assumed interpretation.
 
-## 3. Choose an entry style
+## 4. Choose an entry style
 
 Offer one of these routes when background is missing:
 
@@ -32,7 +43,9 @@ Offer one of these routes when background is missing:
 
 The route changes the explanation order, not the engineering invariant.
 
-## 4. Teach the minimum viable model
+Store an explicitly chosen durable style privately with `set-preferences`. Do not ask again each slice when the stored choice still fits.
+
+## 5. Teach the minimum viable model
 
 Before learner ownership, cover:
 
@@ -45,14 +58,16 @@ Before learner ownership, cover:
 
 Avoid a textbook dump. Link optional deeper material separately and return to the slice.
 
-## 5. Readiness outcomes
+## 6. Readiness outcomes
 
 - **Ready:** the learner explains the immediate invariant or correctly adapts the example. Assign the planned learner-owned task.
 - **Ready with support:** keep the work collaborative, provide interface or test scaffolding, and use the hint ladder.
-- **Not ready yet:** give another representation or smaller experiment; do not repeat the same explanation verbatim.
+- **Not ready yet:** give another representation or smaller experiment; do not repeat the same explanation verbatim. After two unsuccessful attempts, offer four explicit routes: a new example, pairing, a smaller task, or ownership transfer.
 - **Declines this topic:** switch ownership or depth explicitly while preserving the engineering checks.
 
 Readiness is local and temporary. It is not certification, and it does not by itself establish `demonstrated` mastery.
+
+Scaffold incidental mechanics without a learner gate. Imports, assertion syntax, fixture construction, test wiring, and repetitive cases should not obscure the target concept. When several mechanical issues occur, explain and fix them together.
 
 ## Example: u64 codec
 
@@ -63,4 +78,4 @@ Do not begin with “decide what `encodeU64` accepts and `decodeU64` returns.”
 - a persistent codec must choose a fixed byte width and byte order;
 - decoding fewer than eight bytes cannot produce a complete u64 value.
 
-Then walk through a small value such as `258n` as eight bytes in the selected byte order and show one invalid input. Ask the learner to predict a neighboring example or explain why `number` is unsafe. Only after that check should the learner choose the public contract and boundary test.
+Then walk through a small value such as `258n` as eight bytes in the selected byte order and show one invalid input. Ask the learner to predict a neighboring example or explain why `number` is unsafe. If they already answer correctly, skip this lesson. Only after the check should the learner choose the public contract and boundary test.

@@ -22,7 +22,7 @@ Resolve the shared CLI at `../../scripts/guided_build.py` and evidence template 
 1. **Load authoritative context.**
    - Read applicable agent instructions and `.guided-build/project.md`.
    - Validate the contract and require `status: approved`.
-   - Read private status through the CLI; do not print private notes.
+   - Read private status through the CLI; do not print private notes. Reuse stored guidance, verbosity, and struggle preferences when present.
 2. **Select one eligible milestone.**
    - Resume the active milestone when present.
    - Otherwise identify milestones whose delivery prerequisites are complete.
@@ -37,13 +37,13 @@ Resolve the shared CLI at `../../scripts/guided_build.py` and evidence template 
 5. **Calibrate concept readiness.**
    - Separate prerequisite concepts needed before the slice from target concepts learned through the slice.
    - Flag niche, project-specific, low-level, mathematical, concurrency, security, and unfamiliar-tool concepts for explicit calibration. Do not infer knowledge from milestone approval, job title, depth choice, or silence.
-   - For each learning-critical concept, ask a low-friction familiarity question and one small diagnostic grounded in an example. Let the learner answer `new`, `some exposure`, or `comfortable`; never present this as a grade.
-   - When useful across sessions, persist only the learner's self-report with `record-concept <milestone> <concept> unassessed --familiarity new|some_exposure|comfortable`. Do not infer or invent it, and do not expose private status.
-   - Ask whether they prefer theory-first, example-first, or execution-first guidance when the concept is new or the diagnostic shows a gap.
+   - For the smallest prerequisite cluster, ask one low-friction familiarity question and one small diagnostic grounded in an example. Let the learner answer `new`, `some exposure`, or `comfortable`; never present this as a grade.
+   - Persist a supplied familiarity answer with `record-familiarity <milestone> <topic> new|some_exposure|comfortable`. Topics may be narrower than contract concepts. Never invent the answer or copy it into public evidence.
+   - Use `set-preferences` when the learner explicitly chooses a durable guidance, verbosity, or struggle style. Ask about teaching order only when no useful preference exists and the concept is new or the diagnostic shows a gap.
 6. **Teach to the entry point.**
-   - Follow `concept-readiness.md`: explain why the concept appears now, define essential vocabulary, give a concrete worked example, expose the relevant failure mode, and check understanding.
+   - Use the efficient-learning loop from `concept-readiness.md`: one diagnostic → one compact worked example when needed → one focused learner task → one acceptance check. Skip the lesson when the diagnostic is correct.
    - Do not ask the learner to design an interface, predict edge behavior, or write a test whose terms have not been introduced.
-   - Continue when the learner can explain the immediate invariant or modify the worked example. Offer another example, a smaller task, or a mode/ownership change when they are not ready.
+   - Continue when the learner can explain the immediate invariant or modify the worked example. After two unsuccessful attempts, offer a new example, pairing, a smaller task, or ownership transfer. Do not force transfer.
 7. **Brief and partition.**
    - Connect the newly established mental model to actual repository symbols and expected behavior.
    - Ask one prediction or design question whose required background was just checked.
@@ -51,7 +51,7 @@ Resolve the shared CLI at `../../scripts/guided_build.py` and evidence template 
 8. **Execute adaptively.**
    - Let the learner complete their owned decision or implementation.
    - Use the hint ladder when stuck: direction → invariant → location/interface → pseudocode → partial code → full implementation on request.
-   - Implement collaborative and agent-owned work, including mechanical tests and wiring.
+   - Implement collaborative and agent-owned work, including imports, assertion mechanics, fixtures, wiring, and repetitive tests. Batch feedback on incidental mechanics into one response.
    - Never take learner-owned work silently or implement deferred/future scope.
    - Treat repeated confusion as feedback that the teaching or slice size is wrong. Pause, reteach, or repartition.
 9. **Validate continuously.**
@@ -60,8 +60,9 @@ Resolve the shared CLI at `../../scripts/guided_build.py` and evidence template 
    - If automated tests do not exist, use contract-approved compilation, manual behavior, artifact inspection, or reference comparison.
 10. **Update shared evidence.**
    - Create or update `.guided-build/evidence/<milestone-id>.md`.
-   - Record scope, ownership, repository links, commands/results, learning evidence, and deviations.
-   - Keep confidence and misconception notes private.
+   - Maintain an authoritative current snapshot; use the optional `Slice log` only for short durable events.
+   - Record successful decisions, accepted explanations, artifacts, commands/results, and deviations. Do not preserve raw attempts or a tutoring transcript.
+   - Keep familiarity, confidence, misconceptions, guidance preferences, and private-state labels out of shared evidence.
 11. **Hand off to review.**
    - Do not mark mastery `demonstrated` based only on passing tests or agent-authored explanations.
    - Invoke the Guided Build review workflow for the completion decision.
@@ -69,3 +70,11 @@ Resolve the shared CLI at `../../scripts/guided_build.py` and evidence template 
 ## Mid-slice interruption
 
 Before yielding, persist the active slice and evidence already established. On resume, reconcile private state, evidence, working-tree changes, and current tests before continuing.
+
+## Interaction budget
+
+- Routine update: at most 60 words.
+- Learner gate: at most 200 prose words, one primary question, and one code block.
+- Normally use no more than four learner gates per slice.
+- Clarify ambiguous terse answers with one focused question; do not infer acceptance or understanding.
+- Do not narrate every search, test, or evidence write.

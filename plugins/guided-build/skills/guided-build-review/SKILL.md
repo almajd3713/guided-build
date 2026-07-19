@@ -32,8 +32,7 @@ Resolve the shared CLI at `../../scripts/guided_build.py` relative to this skill
    - Connect implementation decisions to the milestone invariant and tests.
    - Explain ownership, failure behavior, and what would break if the invariant were removed.
 4. **Collect mastery evidence.**
-   - Ask for an independent prediction or explanation.
-   - Give one debugging, failure-analysis, or counterexample exercise.
+   - Ask one independent prediction or explanation, then one debugging, failure-analysis, or counterexample exercise only if the first answer is insufficient.
    - Prefer the project's real behavior; use a hypothetical only when a real exercise would be destructive.
    - Apply the rubric without numerical grades.
 5. **Update private state.**
@@ -41,8 +40,8 @@ Resolve the shared CLI at `../../scripts/guided_build.py` relative to this skill
    - Record confidence and misconceptions only when the learner provides them.
    - Schedule revisit after one subsequent milestone, after three milestones, or before a declared dependency—whichever comes first.
 6. **Update shared evidence.**
-   - Record repository facts, validation, decisions, and accepted debt.
-   - Never copy confidence, misconceptions, or private session notes into committed evidence.
+   - Keep the authoritative snapshot concise and record repository facts, successful decisions, validation, and accepted debt. Append only short durable events to the optional slice log.
+   - Never copy familiarity, confidence, misconceptions, guidance preferences, raw attempts, or private session notes into committed evidence.
 7. **Apply prerequisite gates.**
    - Delivery may be complete while mastery remains pending.
    - Block only entry into a milestone that declares the unresolved concept as a prerequisite.

@@ -65,7 +65,7 @@ Format every milestone as `### M01 — Title`. IDs are stable and unique. Each m
 - `Dependent milestones`
 
 List relationships as `- M01`; use `- None` when empty. Keep prerequisite and dependent declarations symmetric.
-List each concept as a bullet under `Concepts`; these names become stable private-state keys.
+List one atomic concept per bullet under `Concepts`; these names become stable private-state keys. Avoid comma-and clusters or semicolon-separated topic lists. The validator warns about likely composite concepts.
 
 A good milestone:
 

@@ -18,12 +18,17 @@ Evaluations must establish:
 - Fast, Balanced, and Deep assign materially different ownership;
 - milestone depth never substitutes for checking prerequisite knowledge;
 - niche concepts receive familiarity calibration, a worked example, and an understanding check before learner ownership;
+- a correct diagnostic skips unnecessary teaching;
+- an ambiguous terse response receives one focused clarification;
+- after two unsuccessful attempts, the learner is offered a new example, pairing, a smaller task, or ownership transfer;
+- incidental mechanics are scaffolded and batched instead of becoming learner gates;
+- routine updates and learner gates stay within the interaction budget;
 - learners can enter new material theory-first, example-first, or execution-first without weakening validation;
 - future milestones remain deferred;
 - high-risk decisions remain collaborative;
 - passing tests alone does not mark mastery demonstrated;
 - prerequisite concepts gate dependent work;
-- private fields never appear in committed evidence or default exports;
+- private fields, learner self-reports, and raw attempts never appear in committed evidence or default exports;
 - missing semantic, documentation, or GitHub tools have local fallbacks;
 - a fresh session can reconcile state, evidence, and repository truth.
 

@@ -36,6 +36,7 @@ Use `assets/project-contract.md` as the output template. Resolve the shared CLI 
 5. **Write a draft contract.**
    - Create `.guided-build/project.md` with `status: draft`.
    - Use unique stable milestone IDs and express prerequisite/dependent relationships in both directions.
+   - List one atomic concept per bullet. Split compound topic clusters without changing milestone scope or ordering.
    - Make each milestone independently testable and exclude later work explicitly.
 6. **Validate and reconcile.**
    - Run `python3 <plugin-root>/scripts/guided_build.py validate-contract .guided-build/project.md`.
