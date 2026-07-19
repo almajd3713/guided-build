@@ -14,22 +14,90 @@ Coding agents create a difficult trade-off: write everything yourself and move s
 
 It does not grade or certify learners. It records evidence that can be revisited.
 
-## Install locally
+## Installation
 
-From this repository:
+Install Guided Build from its public GitHub marketplace:
+
+```bash
+codex plugin marketplace add almajd3713/guided-build
+codex plugin add guided-build@guided-build
+```
+
+Start a new Codex session after installation so the bundled skills are loaded. In Codex CLI, you can also run `/plugins` after adding the marketplace and install **Guided Build** interactively.
+
+To update an existing installation:
+
+```bash
+codex plugin marketplace upgrade guided-build
+codex plugin add guided-build@guided-build
+```
+
+Then start another new Codex session.
+
+For local plugin development from a repository checkout instead:
 
 ```bash
 codex plugin marketplace add .
 codex plugin add guided-build@guided-build
 ```
 
-Start a new Codex thread after installation, then ask:
+The plugin has no required MCP servers, hosted service, account, or telemetry. Python 3.10 or newer is required for deterministic validation and private-state helpers.
+
+## Usage and prompts
+
+Guided Build has three lifecycle workflows. Invoke the one matching the current project state.
+
+### 1. Onboard a project
+
+Use this when the project has a roadmap, specification, issue list, README, or other plan but does not yet have an approved `.guided-build/project.md`:
 
 ```text
 Use Guided Build to onboard this project from its roadmap.
 ```
 
-The plugin has no required MCP servers, hosted service, account, or telemetry. Python 3.10 or newer is required for deterministic validation and private-state helpers.
+Name the source files when you know them:
+
+```text
+Use Guided Build to onboard this project using README.md and docs/roadmap.md.
+```
+
+Onboarding creates a draft learning contract and stops for your review. It does not begin implementation or approve the contract for you.
+
+### 2. Start or continue a milestone
+
+After approving the contract, start the next eligible milestone:
+
+```text
+Start my next Guided Build milestone in Balanced mode.
+```
+
+You can select a milestone and depth explicitly:
+
+```text
+Start M02 in Fast mode.
+Start M03 in Deep mode and teach unfamiliar prerequisites before assigning my work.
+Continue the active Guided Build milestone using example-first guidance.
+```
+
+Fast, Balanced, and Deep change learner ownership, not engineering validation. The milestone workflow checks concept readiness before assigning niche or unfamiliar work.
+
+### 3. Review, resume, or reconcile
+
+Use review after completing a slice or when you want to verify your understanding:
+
+```text
+Review my current Guided Build milestone.
+```
+
+Use resume in a later session or after an interruption:
+
+```text
+Resume this Guided Build project.
+Resume this Guided Build project and reconcile the unfinished milestone evidence.
+Review the active milestone and revisit any prerequisite concepts that are due.
+```
+
+Review keeps delivery and mastery separate, reconciles repository behavior with existing evidence, and preserves private learning notes outside the repository.
 
 ## Project artifacts
 
