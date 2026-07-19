@@ -20,7 +20,7 @@ guided-build-review ─────► delivery status + private mastery state
 The plugin contains three skills with non-overlapping lifecycle triggers:
 
 - Onboard compiles plans into a draft contract and stops for approval.
-- Milestone selects depth, partitions ownership, and delivers one bounded slice.
+- Milestone selects depth, calibrates prerequisite knowledge, teaches to the slice entry point, partitions ownership, and delivers one bounded slice.
 - Review reconciles repository truth, validates delivery, records mastery evidence, and schedules prerequisite reviews.
 
 The Python CLI owns schema parsing, dependency validation, atomic private-state writes, redacted exports, and guarded transitions. Skills own interpretation, teaching, work selection, and interaction.
@@ -30,6 +30,8 @@ The Python CLI owns schema parsing, dependency validation, atomic private-state 
 Delivery statuses are `not_started`, `in_progress`, `blocked`, and `complete`.
 
 Mastery statuses are `unassessed`, `introduced`, `practiced`, `demonstrated`, and `revisit_due`.
+
+Self-reported familiarity is private calibration context, not a mastery status. It influences the explanation entry point but never establishes evidence by itself.
 
 They are intentionally independent. Delivery can complete while mastery remains pending. A later milestone is gated only when it declares a prerequisite whose concepts have not been demonstrated or need revisiting.
 

@@ -1,12 +1,17 @@
 {
   "name": "guided-build",
-  "version": "0.1.0-beta.1",
+  "version": "0.1.0-beta.1+codex.20260719103525",
   "description": "Learn software concepts while delivering projects through evidence-backed milestones.",
   "author": {
     "name": "Guided Build contributors"
   },
   "license": "MIT",
-  "keywords": ["learning", "software-development", "mentoring", "milestones"],
+  "keywords": [
+    "learning",
+    "software-development",
+    "mentoring",
+    "milestones"
+  ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Guided Build",
@@ -14,7 +19,10 @@
     "longDescription": "Normalize a software roadmap, divide work by learning value, and preserve engineering and mastery evidence across sessions.",
     "developerName": "Guided Build contributors",
     "category": "Productivity",
-    "capabilities": ["Interactive", "Write"],
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
     "defaultPrompt": [
       "Onboard this software project into Guided Build.",
       "Start my next Guided Build milestone.",

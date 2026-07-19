@@ -22,6 +22,8 @@ STATE_SCHEMA_VERSION = 1
 DEPTHS = {"fast", "balanced", "deep"}
 DELIVERY_STATUSES = {"not_started", "in_progress", "blocked", "complete"}
 MASTERY_STATUSES = {"unassessed", "introduced", "practiced", "demonstrated", "revisit_due"}
+FAMILIARITY_LEVELS = {"new", "some_exposure", "comfortable"}
+PRIVATE_CONCEPT_FIELDS = {"confidence", "familiarity", "misconceptions"}
 PROJECT_ID_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{1,63}$")
 MILESTONE_RE = re.compile(r"^###\s+([A-Z][A-Z0-9_-]*\d+)\s+[—-]\s+(.+?)\s*$")
 SUBHEADING_RE = re.compile(r"^####\s+(.+?)\s*$")
@@ -436,14 +438,18 @@ def init_state_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def redact_private_notes(state: dict[str, Any]) -> dict[str, Any]:
+    visible = json.loads(json.dumps(state))
+    visible["session_notes"] = []
+    for concept in visible.get("concepts", {}).values():
+        for field in PRIVATE_CONCEPT_FIELDS:
+            concept.pop(field, None)
+    return visible
+
+
 def status_command(args: argparse.Namespace) -> int:
     location, state, _ = load_state(args.contract, args.repo)
-    visible = json.loads(json.dumps(state))
-    if not args.include_private_notes:
-        visible["session_notes"] = []
-        for concept in visible.get("concepts", {}).values():
-            concept.pop("confidence", None)
-            concept.pop("misconceptions", None)
+    visible = state if args.include_private_notes else redact_private_notes(state)
     print(json.dumps({"state_path": str(location), "state": visible}, indent=2))
     return 0
 
@@ -524,6 +530,9 @@ def record_concept_command(args: argparse.Namespace) -> int:
     )
     if args.confidence is not None:
         concept["confidence"] = args.confidence
+    familiarity = getattr(args, "familiarity", None)
+    if familiarity is not None:
+        concept["familiarity"] = familiarity
     if args.evidence:
         evidence = concept.setdefault("evidence_refs", [])
         evidence.extend(item for item in args.evidence if item not in evidence)
@@ -546,12 +555,7 @@ def record_concept_command(args: argparse.Namespace) -> int:
 
 def export_state_command(args: argparse.Namespace) -> int:
     _, state, _ = load_state(args.contract, args.repo)
-    exported = json.loads(json.dumps(state))
-    if not args.include_private_notes:
-        for concept in exported.get("concepts", {}).values():
-            concept.pop("misconceptions", None)
-            concept.pop("confidence", None)
-        exported["session_notes"] = []
+    exported = state if args.include_private_notes else redact_private_notes(state)
     atomic_json(args.output, exported)
     print(
         json.dumps(
@@ -638,6 +642,7 @@ def build_parser() -> argparse.ArgumentParser:
     concept.add_argument("mastery", choices=sorted(MASTERY_STATUSES))
     concept.add_argument("--evidence", action="append")
     concept.add_argument("--confidence", type=int, choices=range(1, 6))
+    concept.add_argument("--familiarity", choices=sorted(FAMILIARITY_LEVELS))
     concept.add_argument("--misconception")
     concept.add_argument("--revisit-after")
     concept.set_defaults(handler=record_concept_command)

@@ -10,8 +10,15 @@
     "id": "balanced-cli-milestone",
     "skill": "guided-build-milestone",
     "prompt": "Start M01 in Balanced mode.",
-    "must": ["ask a prediction", "assign one learning-critical item to the learner", "validate the slice"],
+    "must": ["calibrate concept familiarity", "teach missing prerequisites", "ask a grounded prediction", "assign one learning-critical item to the learner", "validate the slice"],
     "must_not": ["implement M02", "mark mastery from tests alone"]
+  },
+  {
+    "id": "unfamiliar-u64-codec",
+    "skill": "guided-build-milestone",
+    "prompt": "I have never worked with u64 codecs or endianness. Continue the Balanced milestone.",
+    "must": ["acknowledge the knowledge gap", "offer theory-first, example-first, or execution-first", "teach a concrete eight-byte example", "check the immediate mental model before assigning ownership"],
+    "must_not": ["start with an open-ended API design question", "treat unfamiliarity as failed mastery", "silently switch depth"]
   },
   {
     "id": "resume-review",

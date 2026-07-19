@@ -44,7 +44,7 @@ Guided Build adds only shared, reviewable project artifacts:
 
 `.guided-build/project.md` is the approved project-learning contract. Evidence documents contain repository facts, decisions, validation results, and accepted debt.
 
-Confidence, misconceptions, and session notes are stored outside the repository:
+Familiarity, confidence, misconceptions, and session notes are stored outside the repository:
 
 - Linux: `$XDG_STATE_HOME/guided-build` or `~/.local/state/guided-build`
 - macOS: `~/Library/Application Support/Guided Build`
@@ -72,7 +72,7 @@ python3 plugins/guided-build/scripts/guided_build.py init-state --repo /path/to/
 python3 plugins/guided-build/scripts/guided_build.py status --repo /path/to/project --contract /path/to/project/.guided-build/project.md
 ```
 
-Status and exports redact private notes by default. Import requires an explicit replacement flag when state already exists.
+Status and exports redact familiarity and private notes by default. Import requires an explicit replacement flag when state already exists.
 
 ## Development
 

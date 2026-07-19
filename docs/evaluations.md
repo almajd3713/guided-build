@@ -16,6 +16,9 @@ Evaluations must establish:
 - ordinary coding prompts do not trigger Guided Build;
 - contracts contain no fixture-specific leakage;
 - Fast, Balanced, and Deep assign materially different ownership;
+- milestone depth never substitutes for checking prerequisite knowledge;
+- niche concepts receive familiarity calibration, a worked example, and an understanding check before learner ownership;
+- learners can enter new material theory-first, example-first, or execution-first without weakening validation;
 - future milestones remain deferred;
 - high-risk decisions remain collaborative;
 - passing tests alone does not mark mastery demonstrated;

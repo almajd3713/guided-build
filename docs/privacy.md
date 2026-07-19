@@ -14,11 +14,11 @@ They must not contain:
 
 ## Private data
 
-Private state is stored in the platform state directory with restrictive permissions where supported. It includes concept status, confidence provided by the learner, misconceptions, evidence references, and resume notes.
+Private state is stored in the platform state directory with restrictive permissions where supported. It includes concept status, familiarity and confidence provided by the learner, misconceptions, evidence references, and resume notes.
 
 State writes use a temporary file, flush and synchronize it, then atomically replace the target. Explicit imports create a timestamped backup when replacing existing state.
 
-Exports redact confidence, misconceptions, and session notes unless `--include-private-notes` is explicitly supplied.
+Exports and normal status output redact familiarity, confidence, misconceptions, and session notes unless `--include-private-notes` is explicitly supplied.
 
 ## Network and telemetry
 

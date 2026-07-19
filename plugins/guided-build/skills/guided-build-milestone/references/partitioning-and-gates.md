@@ -25,6 +25,7 @@ Classify each candidate task on:
 Pause for:
 
 - depth selection at milestone start;
+- concept readiness before prediction questions or learner ownership;
 - the initial prediction/design response;
 - learner-owned work;
 - high-risk, destructive, external, or hard-to-reverse choices;
@@ -32,6 +33,8 @@ Pause for:
 - delivery acceptance and mastery review.
 
 Do not pause merely to announce searches, routine tests, formatting, fixtures, or other mechanical work.
+
+Ownership follows readiness. When a learner lacks prerequisite background, teach or scaffold first; do not downgrade engineering requirements or treat the initial gap as failed mastery.
 
 ## Slice sizing
 

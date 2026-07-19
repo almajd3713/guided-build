@@ -187,6 +187,7 @@ class StateTests(unittest.TestCase):
                 evidence=["evidence.md"],
                 misconception="Private note marker",
                 revisit_after=None,
+                familiarity="new",
             )
         )
         output = io.StringIO()
@@ -196,6 +197,7 @@ class StateTests(unittest.TestCase):
             )
         self.assertNotIn("Private note marker", output.getvalue())
         self.assertNotIn('"confidence"', output.getvalue())
+        self.assertNotIn('"familiarity"', output.getvalue())
 
         exported = self.root / "export.json"
         self.quietly(guided_build.export_state_command,
@@ -204,7 +206,15 @@ class StateTests(unittest.TestCase):
         export_data = json.loads(exported.read_text(encoding="utf-8"))
         concept = export_data["concepts"]["Boundary validation"]
         self.assertNotIn("confidence", concept)
+        self.assertNotIn("familiarity", concept)
         self.assertNotIn("misconceptions", concept)
+
+        private_output = io.StringIO()
+        with contextlib.redirect_stdout(private_output):
+            guided_build.status_command(
+                self.project_args(include_private_notes=True)
+            )
+        self.assertIn('"familiarity": "new"', private_output.getvalue())
 
     def test_draft_contract_cannot_start_work(self) -> None:
         self.contract.write_text(
@@ -278,6 +288,19 @@ class StateTests(unittest.TestCase):
         self.assertEqual(location.stat().st_mode & 0o777, 0o600)
         self.assertFalse(str(location).startswith(str(self.repo)))
 
+    def test_cli_accepts_private_familiarity_calibration(self) -> None:
+        args = guided_build.build_parser().parse_args(
+            [
+                "record-concept",
+                "M01",
+                "Boundary validation",
+                "unassessed",
+                "--familiarity",
+                "some_exposure",
+            ]
+        )
+        self.assertEqual(args.familiarity, "some_exposure")
+
 
 class PackagingTests(unittest.TestCase):
     def test_skills_are_complete_and_narrowly_triggered(self) -> None:
@@ -312,6 +335,34 @@ class PackagingTests(unittest.TestCase):
             {case["skill"] for case in cases},
             {"guided-build-onboard", "guided-build-milestone", "guided-build-review"},
         )
+
+    def test_milestone_requires_readiness_before_ownership(self) -> None:
+        skill = (
+            ROOT
+            / "plugins"
+            / "guided-build"
+            / "skills"
+            / "guided-build-milestone"
+            / "SKILL.md"
+        ).read_text(encoding="utf-8")
+        self.assertLess(
+            skill.index("Calibrate concept readiness"),
+            skill.index("Brief and partition"),
+        )
+        self.assertIn("Do not ask the learner to design an interface", skill)
+        reference = (
+            ROOT
+            / "plugins"
+            / "guided-build"
+            / "skills"
+            / "guided-build-milestone"
+            / "references"
+            / "concept-readiness.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("## Example: u64 codec", reference)
+        self.assertIn("Theory-first", reference)
+        self.assertIn("Example-first", reference)
+        self.assertIn("Execution-first", reference)
 
 
 if __name__ == "__main__":

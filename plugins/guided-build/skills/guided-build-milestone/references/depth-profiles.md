@@ -1,5 +1,7 @@
 # Guided Build Depth Profiles
 
+Depth controls how much work the learner owns after concept readiness is established. It never permits skipping orientation or assuming prior knowledge.
+
 ## Fast
 
 Use when delivery speed dominates but understanding still matters.
@@ -19,6 +21,8 @@ Default for most milestones.
 - Collaborative: public interface, invariant, primary behavioral test, and high-risk changes.
 - Agent: scaffolding, repetitive cases, fixtures, wiring, and documentation mechanics.
 - Review: code tour, explanation against real symbols, and one counterexample/debug exercise.
+
+If a learning-critical concept is new, begin collaboratively with a worked example and scaffold. Transfer the decision or implementation slice to the learner only after a local readiness check.
 
 ## Deep
 
