@@ -1,6 +1,6 @@
 # Guided Build Depth Profiles
 
-Depth controls how much work the learner owns after concept readiness is established. It never permits skipping orientation or assuming prior knowledge.
+Depth controls how much work the learner owns after concept readiness is established. Granularity independently controls capability packing and gate density; verbosity controls response length. None permits skipping orientation or assuming prior knowledge.
 
 ## Fast
 
@@ -32,6 +32,12 @@ Use when the milestone's mechanism is the primary learning objective.
 - Agent: environment, scaffolding, fixtures, mechanical integration, and review.
 - Guidance: progressive hint ladder; do not reveal full implementation unless requested or the learner changes mode.
 - Review: multiple predictions/counterexamples and independent explanation.
+
+## Granularity
+
+- `lean`: preserve the capability outcome while minimizing pedagogical pauses.
+- `adaptive`: spend gates only where current evidence shows learning value or risk.
+- `thorough`: allow more retrieval and counterexamples without fragmenting delivery.
 
 ## Mode changes
 

@@ -26,7 +26,7 @@ Pause for:
 
 - depth selection at milestone start;
 - concept readiness before prediction questions or learner ownership;
-- the initial prediction/design response;
+- the initial prediction/design response when equivalent evidence does not already exist;
 - learner-owned work;
 - high-risk, destructive, external, or hard-to-reverse choices;
 - transfer of learner-owned work to the agent;
@@ -36,6 +36,18 @@ Do not pause merely to announce searches, routine tests, formatting, fixtures, o
 
 Ownership follows readiness. When a learner lacks prerequisite background, teach or scaffold first; do not downgrade engineering requirements or treat the initial gap as failed mastery.
 
-## Slice sizing
+## Capability sizing
 
-Choose the smallest slice that produces observable behavior and can be validated independently. Split when a different invariant, decision gate, or prerequisite concept begins. Do not use changed-line thresholds.
+Use the approved capability bundle as the stable delivery unit. Within it, choose the largest cohesive work packet that shares one outcome and validation gate. Keep related codecs, operations, or tests together when splitting them would create repeated calibration and acceptance conversations.
+
+Split only when a different invariant, prerequisite cluster, risk class, or independent validation outcome begins. Do not use changed-line counts or one-function-per-task rules. If a split would require a new capability ID, revise the contract first.
+
+## Granularity and gate budgets
+
+| Granularity | Pedagogical gates | Recovery behavior |
+|---|---:|---|
+| Lean | At most 2 | One remediation, then offer scaffold/pair/transfer |
+| Adaptive | Normally 2; third only for high risk or explicit depth request | Match demonstrated need |
+| Thorough | At most 4 | Explore additional counterexamples when useful |
+
+Approvals required for safety or external actions are outside this budget. A correct design response, accepted learner artifact, or diagnosis can satisfy the acceptance gate; do not require a redundant final diagnostic.

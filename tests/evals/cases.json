@@ -82,5 +82,68 @@
     "prompt": "Resume this Guided Build project and review the active milestone.",
     "must": ["reconcile repository first", "separate delivery and mastery", "redact private notes"],
     "must_not": ["trust private state over repository behavior", "claim certification"]
+  },
+  {
+    "id": "cohesive-varint-capability",
+    "skill": "guided-build-onboard",
+    "prompt": "Normalize exact decoding, prefix decoding, and length-prefixed byte fields for the same varint codec.",
+    "must": ["keep one integrated capability", "use one observable outcome", "declare focused validation"],
+    "must_not": ["create one capability per function", "invent a new milestone"]
+  },
+  {
+    "id": "cohesive-crc-frame-capability",
+    "skill": "guided-build-onboard",
+    "prompt": "Normalize CRC verification and the frame header it protects.",
+    "must": ["keep CRC and framing cohesive", "retain atomic concepts", "use stable capability IDs"],
+    "must_not": ["split by API surface", "drop malformed-frame validation"]
+  },
+  {
+    "id": "reuse-related-familiarity",
+    "skill": "guided-build-milestone",
+    "prompt": "Continue the next binary codec capability; I already demonstrated fixed-width byte order in the previous one.",
+    "must": ["reuse related evidence", "start from the remaining concept gap", "avoid repeated calibration"],
+    "must_not": ["ask the same familiarity question", "repeat the prior primer"]
+  },
+  {
+    "id": "accepted-design-no-final-diagnostic",
+    "skill": "guided-build-review",
+    "prompt": "I already defended the boundary design and diagnosed its failing counterexample; review the capability.",
+    "must": ["inspect existing evidence", "credit accepted design and diagnosis", "separate delivery and mastery"],
+    "must_not": ["require a ritual final diagnostic", "mark mastery from tests alone"]
+  },
+  {
+    "id": "learner-artifact-substitutes-final",
+    "skill": "guided-build-review",
+    "prompt": "My learner-owned test demonstrates the invariant and catches the malformed case. Complete the review.",
+    "must": ["evaluate the artifact", "reuse it as applied evidence", "ask only for genuinely missing evidence"],
+    "must_not": ["automatically add two review questions", "ignore authorship"]
+  },
+  {
+    "id": "adaptive-two-gate-budget",
+    "skill": "guided-build-milestone",
+    "prompt": "Continue this ordinary capability with Adaptive granularity.",
+    "must": ["use at most two pedagogical gates", "batch mechanical work", "preserve the capability outcome"],
+    "must_not": ["fragment into API-sized slices", "use a third gate without high risk or request"]
+  },
+  {
+    "id": "evidence-compaction-transition",
+    "skill": "guided-build-milestone",
+    "prompt": "The milestone evidence has seven log entries and the current capability is ready to complete.",
+    "must": ["allow current capability completion", "collapse older events", "retain the latest five entries"],
+    "must_not": ["start the next capability before compaction", "preserve a tutoring transcript"]
+  },
+  {
+    "id": "no-undeclared-capability",
+    "skill": "guided-build-milestone",
+    "prompt": "Repository discovery suggests an extra subsystem not represented by the active capability.",
+    "must": ["identify scope mismatch", "propose contract revision", "keep stable capability IDs"],
+    "must_not": ["invent a dynamic capability", "silently absorb future scope"]
+  },
+  {
+    "id": "budgeted-code-graph-use",
+    "skill": "guided-build-milestone",
+    "prompt": "Use the available code graph to orient this capability, then continue implementation.",
+    "must": ["check freshness once", "use at most two discovery calls", "switch to targeted source reads"],
+    "must_not": ["reindex after every edit", "record graph health as learning evidence"]
   }
 ]

@@ -2,7 +2,7 @@
 
 The learner should encounter productive difficulty, not unexplained vocabulary. Depth controls ownership after orientation; it is not evidence of prior knowledge.
 
-## 1. Build a concept map for the slice
+## 1. Build a concept map for the capability
 
 Classify each learning-critical concept as:
 
@@ -14,14 +14,14 @@ Flag concepts that are niche, project-specific, unusually low-level, mathematica
 
 ## 2. Use the efficient-learning loop
 
-For each slice, prefer this sequence:
+For each capability, prefer this sequence:
 
 1. one concrete diagnostic;
 2. one compact worked example only when the diagnostic reveals a gap;
 3. one focused learner task;
 4. one acceptance check tied to the invariant.
 
-Skip the lesson when the diagnostic is correct. Reuse recent accepted evidence instead of retesting established knowledge. Normally keep a slice to four learner gates or fewer.
+Skip the lesson when the diagnostic is correct. Reuse recent accepted evidence for the same or closely related concept instead of repeating familiarity questions. Respect the selected granularity budget.
 
 ## 3. Calibrate without turning it into an exam
 
@@ -31,7 +31,7 @@ Ask a compact question such as:
 
 Follow with one concrete diagnostic that reveals the learner's current mental model. Prefer explaining a tiny example over asking an open-ended architecture question. Do not use confidence alone as mastery evidence, and do not interpret an incorrect answer as failure.
 
-When several concepts are involved, calibrate the smallest prerequisite cluster rather than asking a long questionnaire. A terse answer that could mean several things needs one focused clarification, not an assumed interpretation.
+When several concepts are involved, calibrate the smallest prerequisite cluster rather than asking a long questionnaire. If related familiarity or accepted evidence already exists, begin from it. A terse answer that could mean several things needs one focused clarification, not an assumed interpretation.
 
 ## 4. Choose an entry style
 
@@ -62,7 +62,7 @@ Avoid a textbook dump. Link optional deeper material separately and return to th
 
 - **Ready:** the learner explains the immediate invariant or correctly adapts the example. Assign the planned learner-owned task.
 - **Ready with support:** keep the work collaborative, provide interface or test scaffolding, and use the hint ladder.
-- **Not ready yet:** give another representation or smaller experiment; do not repeat the same explanation verbatim. After two unsuccessful attempts, offer four explicit routes: a new example, pairing, a smaller task, or ownership transfer.
+- **Not ready yet:** give another representation or smaller experiment; do not repeat the same explanation verbatim. After one unsuccessful retry in Lean, or two in Adaptive/Thorough, offer four explicit routes: a new example, pairing, a smaller task, or ownership transfer.
 - **Declines this topic:** switch ownership or depth explicitly while preserving the engineering checks.
 
 Readiness is local and temporary. It is not certification, and it does not by itself establish `demonstrated` mastery.

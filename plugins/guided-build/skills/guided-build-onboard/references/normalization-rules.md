@@ -15,9 +15,11 @@ Build a source map before authoring milestones:
 |---|---|---|---|
 | Heading/link | Short summary | ID or none | included, reference, optional, or excluded |
 
-Preserve mandatory/optional distinctions. Turn broad phases into multiple milestones only when they have separate validation gates or prerequisite concepts. Merge tiny tasks when separation adds no learning or delivery value.
+Preserve mandatory/optional distinctions. Turn broad phases into multiple milestones only when they have separate exit gates or prerequisite concepts. Within a milestone, group work into capability bundles around an integrated outcome and its focused validation. Merge function-sized tasks that share an invariant, implementation surface, and acceptance gate.
 
 Split composite concept phrases into atomic bullets inside the same milestone. This refines calibration and prerequisite review without inventing new scope or milestones.
+
+Keep capability IDs stable when regenerating. Move work between capabilities or milestones only when the source roadmap changes or the existing placement creates a materially wrong prerequisite/validation boundary. Record every relocation in the source map; never silently drop labs, experiments, or deferred checks.
 
 ## Ambiguity policy
 
@@ -41,4 +43,4 @@ Otherwise choose the simplest reversible interpretation and record it in the dra
 
 ## Idempotence
 
-When a contract exists, compare it with current sources. Preserve manually edited IDs, wording, exclusions, and approval status unless the user requests regeneration. Produce a proposed diff rather than replacing it wholesale.
+When a contract exists, compare it with current sources. Preserve manually edited IDs, wording, exclusions, and approval status unless the user requests regeneration. A v1 contract must be explicitly regenerated as v2; preserve its source mapping and project intent, then request approval for material repartitioning. Otherwise produce a proposed diff rather than replacing it wholesale.

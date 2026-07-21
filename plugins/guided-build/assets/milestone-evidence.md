@@ -1,15 +1,18 @@
 ---
-schema: guided-build/evidence/v1
+schema: guided-build/evidence/v2
 milestone_id: M01
 depth: balanced
+granularity: adaptive
 delivery_status: in_progress
+active_capability: "M01.C01"
+completed_capabilities: []
 ---
 
 # Milestone Evidence
 
 ## Scope and ownership
 
-Record the approved slice and learner/collaborative/agent/deferred ownership map.
+Record the approved capability and learner/collaborative/agent/deferred ownership map.
 
 ## Changes
 
@@ -33,4 +36,4 @@ Record delivery acceptance separately from pending mastery reviews.
 
 ## Slice log
 
-Optional. Append dated durable events only; keep each entry to 60 words or fewer. The sections above remain the authoritative current snapshot, normally 600 words or fewer in total.
+Optional. Retain no more than five dated durable events, each 60 words or fewer. Collapse older events into one capability outcome summary and rely on repository history. The sections above remain the authoritative current snapshot, at most 600 words in total.

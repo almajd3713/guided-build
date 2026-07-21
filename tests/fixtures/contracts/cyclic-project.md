@@ -1,9 +1,10 @@
 ---
-schema: guided-build/v1
+schema: guided-build/v2
 project_id: "cycle"
 title: "Cycle"
 plan_sources: ["plan.md"]
 default_depth: fast
+default_granularity: lean
 status: draft
 ---
 
@@ -57,6 +58,16 @@ Explain.
 
 - M02
 
+#### Capability bundles
+
+##### M01.C01 — First capability
+
+- Outcome: "First outcome"
+- Concepts: ["First concept"]
+- Prerequisites: []
+- Deliverables: ["First delivery"]
+- Validation: "Inspect first"
+
 ### M02 — Second
 
 #### Objective
@@ -90,3 +101,13 @@ Explain.
 #### Dependent milestones
 
 - M01
+
+#### Capability bundles
+
+##### M02.C01 — Second capability
+
+- Outcome: "Second outcome"
+- Concepts: ["Second concept"]
+- Prerequisites: []
+- Deliverables: ["Second delivery"]
+- Validation: "Inspect second"

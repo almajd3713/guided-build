@@ -57,6 +57,9 @@ class ContractTests(unittest.TestCase):
             text = VALID_CONTRACT.read_text(encoding="utf-8").replace(
                 "- Boundary validation",
                 "- Parsing, validation, and error reporting",
+            ).replace(
+                '["Boundary validation"]',
+                '["Parsing, validation, and error reporting"]',
             )
             path.write_text(text, encoding="utf-8")
             report = guided_build.validate_contract(path)
@@ -100,6 +103,98 @@ class ContractTests(unittest.TestCase):
         report = guided_build.validate_evidence(VALID_EVIDENCE, VALID_CONTRACT)
         self.assertEqual(report["metadata"]["milestone_id"], "M01")
 
+    def test_capability_bundle_is_structured(self) -> None:
+        report = guided_build.validate_contract(VALID_CONTRACT)
+        capability = report["milestones"]["M01"]["capabilities"]["M01.C01"]
+        self.assertEqual(capability["concepts"], ["Boundary validation"])
+        self.assertEqual(capability["prerequisites"], [])
+        self.assertEqual(len(capability["deliverables"]), 2)
+
+    def test_v1_contract_has_actionable_migration_error(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "project.md"
+            path.write_text(
+                VALID_CONTRACT.read_text(encoding="utf-8").replace(
+                    "guided-build/v2", "guided-build/v1", 1
+                ),
+                encoding="utf-8",
+            )
+            report = guided_build.validate_contract(path)
+            self.assertFalse(report["valid"])
+            self.assertTrue(any("regenerate" in item for item in report["errors"]))
+
+    def test_capability_rejects_undeclared_concept_and_unknown_prerequisite(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "project.md"
+            text = VALID_CONTRACT.read_text(encoding="utf-8").replace(
+                '["Boundary validation"]', '["Undeclared"]', 1
+            ).replace(
+                "- Prerequisites: []", '- Prerequisites: ["M01.C99"]', 1
+            )
+            path.write_text(text, encoding="utf-8")
+            report = guided_build.validate_contract(path)
+            self.assertFalse(report["valid"])
+            self.assertTrue(any("undeclared concept" in item for item in report["errors"]))
+            self.assertTrue(any("unknown capability" in item for item in report["errors"]))
+
+    def test_capability_cycle_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "project.md"
+            text = VALID_CONTRACT.read_text(encoding="utf-8").replace(
+                "- Prerequisites: []", '- Prerequisites: ["M01.C01"]', 1
+            )
+            path.write_text(text, encoding="utf-8")
+            report = guided_build.validate_contract(path)
+            self.assertFalse(report["valid"])
+            self.assertTrue(any("capability dependency cycle" in item for item in report["errors"]))
+
+    def test_more_than_eight_capabilities_warns(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "project.md"
+            source = VALID_CONTRACT.read_text(encoding="utf-8")
+            marker = "\n### M02 — File persistence"
+            bundles = []
+            for number in range(2, 10):
+                bundles.append(
+                    f'''\n##### M01.C{number:02d} — Extra {number}\n\n'''
+                    '- Outcome: "Extra outcome"\n'
+                    '- Concepts: ["Boundary validation"]\n'
+                    '- Prerequisites: []\n'
+                    '- Deliverables: ["Extra delivery"]\n'
+                    '- Validation: "Extra validation"\n'
+                )
+            path.write_text(source.replace(marker, "".join(bundles) + marker), encoding="utf-8")
+            report = guided_build.validate_contract(path)
+            self.assertTrue(report["valid"], report["errors"])
+            self.assertTrue(any("prefer at most 8" in item for item in report["warnings"]))
+
+    def test_evidence_budget_warns_without_invalidating(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "evidence.md"
+            text = VALID_EVIDENCE.read_text(encoding="utf-8").replace(
+                "The command parser now produces a validated command model.",
+                " ".join(["word"] * 601),
+            )
+            path.write_text(text, encoding="utf-8")
+            report = guided_build.validate_evidence(path, VALID_CONTRACT)
+            self.assertTrue(report["valid"], report["errors"])
+            self.assertTrue(report["compaction_required"])
+
+    def test_evidence_log_count_and_entry_size_warn(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "evidence.md"
+            source = VALID_EVIDENCE.read_text(encoding="utf-8")
+            prefix = source.split("## Slice log", 1)[0]
+            entries = [
+                f"### Entry {index}\n\n" + ("word " * (61 if index == 1 else 3))
+                for index in range(1, 7)
+            ]
+            path.write_text(prefix + "## Slice log\n\n" + "\n".join(entries), encoding="utf-8")
+            report = guided_build.validate_evidence(path, VALID_CONTRACT)
+            self.assertTrue(report["valid"], report["errors"])
+            self.assertTrue(any("6 entries" in item for item in report["warnings"]))
+            self.assertTrue(any("entry 1" in item for item in report["warnings"]))
+
 
 class StateTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -131,6 +226,36 @@ class StateTests(unittest.TestCase):
         with contextlib.redirect_stdout(io.StringIO()):
             return command(args)  # type: ignore[operator]
 
+    def add_second_m01_capability(self) -> None:
+        marker = "\n### M02 — File persistence"
+        capability = '''
+##### M01.C02 — Report parsed commands
+
+- Outcome: "Validated commands are rendered for users"
+- Concepts: ["Boundary validation"]
+- Prerequisites: ["M01.C01"]
+- Deliverables: ["Command formatter"]
+- Validation: "Formatter tests pass"
+'''
+        self.contract.write_text(
+            self.contract.read_text(encoding="utf-8").replace(marker, capability + marker),
+            encoding="utf-8",
+        )
+
+    def write_partial_evidence(self, *, large: bool = False) -> None:
+        text = VALID_EVIDENCE.read_text(encoding="utf-8").replace(
+            "delivery_status: complete", "delivery_status: in_progress"
+        ).replace(
+            'completed_capabilities: ["M01.C01"]',
+            'completed_capabilities: ["M01.C01"]',
+        )
+        if large:
+            text = text.replace(
+                "The command parser now produces a validated command model.",
+                " ".join(["word"] * 601),
+            )
+        self.evidence.write_text(text, encoding="utf-8")
+
     def test_delivery_and_mastery_are_separate_prerequisite_gates(self) -> None:
         self.quietly(guided_build.init_state_command, self.project_args())
         self.quietly(guided_build.start_milestone_command,
@@ -146,6 +271,15 @@ class StateTests(unittest.TestCase):
                 misconception="Validation belongs only in the UI.",
                 revisit_after="M02",
             )
+        )
+        self.quietly(
+            guided_build.set_capability_delivery_command,
+            self.project_args(
+                milestone="M01",
+                capability="M01.C01",
+                status="complete",
+                evidence=self.evidence,
+            ),
         )
         self.quietly(guided_build.set_delivery_command,
             self.project_args(
@@ -316,7 +450,7 @@ class StateTests(unittest.TestCase):
         self.contract.write_text(
             self.contract.read_text(encoding="utf-8").replace(
                 "- Boundary validation", "- Input validation"
-            ),
+            ).replace('["Boundary validation"]', '["Input validation"]'),
             encoding="utf-8",
         )
         _, state, contract = guided_build.load_state(self.contract, self.repo)
@@ -398,7 +532,7 @@ class StateTests(unittest.TestCase):
         malformed.write_text(
             json.dumps(
                 {
-                    "schema_version": 1,
+                    "schema_version": 2,
                     "project_id": "sample-cli",
                     "milestones": [],
                     "concepts": {},
@@ -411,6 +545,116 @@ class StateTests(unittest.TestCase):
             guided_build.import_state_command(
                 self.project_args(input=malformed, replace=False)
             )
+
+    def test_granularity_preference_persists_and_sets_milestone(self) -> None:
+        self.quietly(
+            guided_build.set_preferences_command,
+            self.project_args(
+                guidance=None,
+                granularity="lean",
+                verbosity=None,
+                struggle=None,
+            ),
+        )
+        self.quietly(
+            guided_build.start_milestone_command,
+            self.project_args(milestone="M01", depth="balanced"),
+        )
+        _, state, _ = guided_build.load_state(self.contract, self.repo)
+        self.assertEqual(state["preferences"]["granularity"], "lean")
+        self.assertEqual(state["milestones"]["M01"]["granularity"], "lean")
+
+    def test_capability_prerequisite_then_completion(self) -> None:
+        self.add_second_m01_capability()
+        self.write_partial_evidence()
+        self.quietly(
+            guided_build.start_milestone_command,
+            self.project_args(milestone="M01", depth="balanced"),
+        )
+        with self.assertRaisesRegex(guided_build.GuidedBuildError, "M01.C01"):
+            guided_build.start_capability_command(
+                self.project_args(
+                    milestone="M01", capability="M01.C02", evidence=self.evidence
+                )
+            )
+        self.quietly(
+            guided_build.set_capability_delivery_command,
+            self.project_args(
+                milestone="M01",
+                capability="M01.C01",
+                status="complete",
+                evidence=self.evidence,
+            ),
+        )
+        self.quietly(
+            guided_build.start_capability_command,
+            self.project_args(
+                milestone="M01", capability="M01.C02", evidence=self.evidence
+            ),
+        )
+        _, state, _ = guided_build.load_state(self.contract, self.repo)
+        self.assertEqual(state["milestones"]["M01"]["active_capability"], "M01.C02")
+
+    def test_compaction_blocks_start_but_not_current_completion(self) -> None:
+        self.write_partial_evidence(large=True)
+        self.quietly(
+            guided_build.start_milestone_command,
+            self.project_args(milestone="M01", depth="balanced"),
+        )
+        with self.assertRaisesRegex(guided_build.GuidedBuildError, "compaction"):
+            guided_build.start_capability_command(
+                self.project_args(
+                    milestone="M01", capability="M01.C01", evidence=self.evidence
+                )
+            )
+        self.quietly(
+            guided_build.set_capability_delivery_command,
+            self.project_args(
+                milestone="M01",
+                capability="M01.C01",
+                status="complete",
+                evidence=self.evidence,
+            ),
+        )
+        _, state, _ = guided_build.load_state(self.contract, self.repo)
+        self.assertEqual(
+            state["milestones"]["M01"]["capabilities"]["M01.C01"]["delivery_status"],
+            "complete",
+        )
+
+    def test_v1_state_migrates_with_backup_and_private_data(self) -> None:
+        location, contract = guided_build.state_location(self.contract, self.repo)
+        old_state = {
+            "schema_version": 1,
+            "project_id": "sample-cli",
+            "contract_path": str(self.contract),
+            "repo_hint": str(self.repo),
+            "active_milestone": "M01",
+            "milestones": {
+                "M01": {
+                    "delivery_status": "in_progress",
+                    "depth": "balanced",
+                    "active_slice": "parser",
+                    "concepts": ["Boundary validation"],
+                }
+            },
+            "concepts": {"Boundary validation": {"mastery_status": "practiced"}},
+            "preferences": {"verbosity": "compact"},
+            "calibration_topics": {"M01": {}},
+            "session_notes": [],
+            "created_at": guided_build.utc_now(),
+            "updated_at": guided_build.utc_now(),
+        }
+        guided_build.atomic_json(location, old_state)
+        _, state, _ = guided_build.load_state(self.contract, self.repo)
+        self.assertEqual(state["schema_version"], 2)
+        self.assertEqual(state["preferences"]["verbosity"], "compact")
+        self.assertEqual(state["concepts"]["Boundary validation"]["mastery_status"], "practiced")
+        self.assertEqual(
+            state["milestones"]["M01"]["capabilities"]["M01.C01"]["delivery_status"],
+            "not_started",
+        )
+        self.assertEqual(len(list(location.parent.glob("*.bak"))), 1)
 
     @unittest.skipIf(os.name == "nt", "POSIX permissions are not available on Windows")
     def test_private_state_is_owner_read_write_only(self) -> None:
@@ -434,13 +678,26 @@ class StateTests(unittest.TestCase):
 
     def test_cli_accepts_preference_and_topic_commands(self) -> None:
         preferences = guided_build.build_parser().parse_args(
-            ["set-preferences", "--guidance", "execution_first", "--verbosity", "compact"]
+            [
+                "set-preferences",
+                "--guidance",
+                "execution_first",
+                "--granularity",
+                "lean",
+                "--verbosity",
+                "compact",
+            ]
         )
         self.assertEqual(preferences.guidance, "execution_first")
+        self.assertEqual(preferences.granularity, "lean")
         familiarity = guided_build.build_parser().parse_args(
             ["record-familiarity", "M01", "u64 codecs", "new"]
         )
         self.assertEqual(familiarity.topic, "u64 codecs")
+        capability = guided_build.build_parser().parse_args(
+            ["start-capability", "M01", "M01.C01"]
+        )
+        self.assertEqual(capability.capability, "M01.C01")
 
 
 class PackagingTests(unittest.TestCase):

@@ -1,9 +1,10 @@
 ---
-schema: guided-build/v1
+schema: guided-build/v2
 project_id: "sample-cli"
 title: "Sample CLI"
 plan_sources: ["../plans/python-cli.md"]
 default_depth: balanced
+default_granularity: adaptive
 status: approved
 ---
 
@@ -57,6 +58,16 @@ Predict malformed-input behavior and implement or diagnose one parser edge case.
 
 - M02
 
+#### Capability bundles
+
+##### M01.C01 — Parse validated commands
+
+- Outcome: "Commands cross one validated boundary"
+- Concepts: ["Boundary validation"]
+- Prerequisites: []
+- Deliverables: ["Add command parser", "List command parser"]
+- Validation: "Parser tests and CLI help pass"
+
 ### M02 — File persistence
 
 #### Objective
@@ -90,3 +101,13 @@ Explain the durable state transition and diagnose one simulated failure.
 #### Dependent milestones
 
 - None
+
+#### Capability bundles
+
+##### M02.C01 — Persist local tasks
+
+- Outcome: "Tasks survive a process restart"
+- Concepts: ["Atomic replacement"]
+- Prerequisites: []
+- Deliverables: ["Atomic save", "Missing-file recovery"]
+- Validation: "Persistence and interrupted-replacement tests pass"

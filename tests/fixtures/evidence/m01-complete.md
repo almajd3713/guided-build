@@ -1,8 +1,11 @@
 ---
-schema: guided-build/evidence/v1
+schema: guided-build/evidence/v2
 milestone_id: M01
 depth: balanced
+granularity: adaptive
 delivery_status: complete
+active_capability: "none"
+completed_capabilities: ["M01.C01"]
 ---
 
 # M01 Evidence
@@ -30,3 +33,9 @@ Update commands remain deferred.
 ## Acceptance
 
 Delivery is accepted; boundary validation remains practiced until review.
+
+## Slice log
+
+### M01.C01 completed
+
+Parser behavior and validation evidence were accepted.

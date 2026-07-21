@@ -20,22 +20,24 @@ Use this YAML-compatible, JSON-valued subset:
 
 ```yaml
 ---
-schema: guided-build/v1
+schema: guided-build/v2
 project_id: "lowercase-project-id"
 title: "Human-readable title"
 plan_sources: ["docs/roadmap.md"]
 default_depth: balanced
+default_granularity: adaptive
 status: draft
 ---
 ```
 
 Required values:
 
-- `schema`: exactly `guided-build/v1`.
+- `schema`: exactly `guided-build/v2`.
 - `project_id`: 2–64 lowercase letters, digits, hyphens, or underscores.
 - `title`: the project title.
 - `plan_sources`: non-empty JSON-style array of repository paths or URLs.
 - `default_depth`: `fast`, `balanced`, or `deep`.
+- `default_granularity`: `adaptive`, `lean`, or `thorough`.
 - `status`: `draft` until explicit approval, then `approved`.
 
 Unknown frontmatter keys are preserved for forward compatibility. Do not invent keys for personal learning data.
@@ -63,13 +65,28 @@ Format every milestone as `### M01 — Title`. IDs are stable and unique. Each m
 - `Validation`
 - `Learning evidence`
 - `Dependent milestones`
+- `Capability bundles`
 
 List relationships as `- M01`; use `- None` when empty. Keep prerequisite and dependent declarations symmetric.
 List one atomic concept per bullet under `Concepts`; these names become stable private-state keys. Avoid comma-and clusters or semicolon-separated topic lists. The validator warns about likely composite concepts.
 
+A capability bundle uses this exact shape:
+
+```markdown
+##### M01.C01 — Canonical binary fields
+
+- Outcome: "One observable integrated result"
+- Concepts: ["Binary representation"]
+- Prerequisites: []
+- Deliverables: ["Exact and prefix decoding", "Length-prefixed bytes"]
+- Validation: "Focused tests and milestone checks"
+```
+
+Capability IDs are stable `<milestone>.C<number>` identifiers. Every named concept must be an atomic concept declared by the milestone. Prerequisites reference capabilities in the same milestone and must be acyclic. Every bundle needs a non-empty Outcome, Deliverables, and Validation. Prefer 2–6 bundles; the validator warns above 8.
+
 A good milestone:
 
-- produces one observable, independently testable capability;
+- produces several cohesive, independently testable capabilities without fragmenting one integrated outcome into API-sized tasks;
 - identifies the concepts whose implementation creates learning value;
 - distinguishes required delivery from future-stage work;
 - states what evidence would demonstrate understanding;

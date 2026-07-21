@@ -1,9 +1,10 @@
 ---
-schema: guided-build/v1
+schema: guided-build/v2
 project_id: "replace-me"
 title: "Replace Me"
 plan_sources: ["path/to/plan.md"]
 default_depth: balanced
+default_granularity: adaptive
 status: draft
 ---
 
@@ -56,3 +57,13 @@ Describe the prediction, implementation, explanation, or debugging evidence expe
 #### Dependent milestones
 
 - None
+
+#### Capability bundles
+
+##### M01.C01 — Replace Me
+
+- Outcome: "Describe one integrated observable result."
+- Concepts: ["Replace with a declared atomic concept."]
+- Prerequisites: []
+- Deliverables: ["List cohesive implementation artifacts."]
+- Validation: "Name the focused acceptance gate."

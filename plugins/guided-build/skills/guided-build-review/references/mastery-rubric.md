@@ -20,7 +20,7 @@ Evidence may include:
 - diagnosis of a failing test, trace, or counterexample;
 - a design trade-off defended against an alternative.
 
-To record `demonstrated`, require an independent explanation/prediction and one applied diagnostic or implementation item. Store evidence links; do not assign scores.
+To record `demonstrated`, require an independent explanation/prediction and one applied diagnostic or implementation item. These may have occurred during capability work; reuse accepted evidence instead of demanding a final quiz. Store evidence links; do not assign scores.
 
 ## Revisit scheduling
 
